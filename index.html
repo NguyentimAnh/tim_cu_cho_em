@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acertbook</title>
+<link rel="icon" type="image/png" href="anh/chinhthuc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f7;
+    --fg: #0a0a0a;
+    --fg2: #555;
+    --accent: #1a1aff;
+    --accent2: #ff2d55;
+    --card: #fff;
+    --card-border: rgba(0,0,0,0.08);
+    --nav-bg: rgba(255,255,255,0.85);
+    --circle-color: rgba(26,26,255,0.06);
+    --circle-border: rgba(26,26,255,0.12);
+    --shadow: 0 4px 32px rgba(0,0,0,0.08);
+    --letter-bg: #fafaf8;
+    --letter-border: #d6d0c0;
+    --marquee-bg: #f0f0f0;
+  }
+  [data-theme="dark"] {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --fg: #f0f0f0;
+    --fg2: #888;
+    --accent: #4d79ff;
+    --accent2: #ff2d55;
+    --card: #16161e;
+    --card-border: rgba(255,255,255,0.07);
+    --nav-bg: rgba(10,10,15,0.88);
+    --circle-color: rgba(77,121,255,0.05);
+    --circle-border: rgba(77,121,255,0.15);
+    --shadow: 0 4px 32px rgba(0,0,0,0.4);
+    --letter-bg: #111118;
+    --letter-border: #2a2a3a;
+    --marquee-bg: #111118;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    transition: background 0.4s, color 0.4s;
+  }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+  /* NAVBAR */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0 5vw; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.4s;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  }
+  .nav-logo-icon img { width:100%; height:100%; border-radius:10px; object-fit:contain; display:block; }
+  .nav-logo-icon svg { width: 20px; height: 20px; fill: white; }
+  .nav-logo-text { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--fg); letter-spacing: -0.5px; }
+  .nav-links { display: flex; align-items: center; gap: 8px; list-style: none; }
+  .nav-links a {
+    color: var(--fg2); text-decoration: none; font-size: 14px; font-weight: 500;
+    padding: 6px 14px; border-radius: 8px; transition: color 0.2s, background 0.2s;
+  }
+  .nav-links a:hover { color: var(--fg); background: var(--card-border); }
+  .theme-btn {
+    width: 38px; height: 38px; border: 1.5px solid var(--card-border);
+    background: transparent; border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--fg); transition: background 0.2s, color 0.2s, border 0.2s;
+  }
+  .theme-btn:hover { background: var(--card-border); }
+  .theme-btn svg { width: 18px; height: 18px; }
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--fg); padding: 4px; }
+  .nav-toggle svg { width: 22px; height: 22px; }
+
+  /* MOBILE MENU */
+  .mobile-menu {
+    display: none; position: fixed; top: 64px; left: 0; right: 0;
+    background: var(--nav-bg); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 16px 5vw; z-index: 999; flex-direction: column; gap: 4px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    color: var(--fg2); text-decoration: none; font-size: 15px; font-weight: 500;
+    padding: 10px 14px; border-radius: 8px; transition: color 0.2s, background 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--fg); background: var(--card-border); }
+
+  /* HERO */
+  #hero { min-height: 100vh; padding: 64px 5vw 0; display: flex; align-items: center; position: relative; overflow: hidden; }
+  .circles-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .circle {
+    position: absolute; border-radius: 50%;
+    background: var(--circle-color); border: 1.5px solid var(--circle-border);
+    animation: flyCircle linear infinite;
+  }
+  @keyframes flyCircle {
+    0%   { transform: translate(0,0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translate(-110vw,-110vh) rotate(-45deg); opacity: 0; }
+  }
+  .hero-content {
+    position: relative; z-index: 2; display: flex; align-items: center; gap: 6vw;
+    width: 100%; max-width: 1200px; margin: 0 auto; padding: 80px 0 60px;
+  }
+  .hero-logo { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .hero-logo-ring {
+    width: clamp(100px, 14vw, 160px); height: clamp(100px, 14vw, 160px);
+    border-radius: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 48px rgba(26,26,255,0.25); position: relative; overflow: hidden;
+  }
+  .hero-logo-ring::before {
+    content: ''; position: absolute; inset: -50%;
+    background: conic-gradient(transparent 0deg, rgba(255,255,255,0.3) 60deg, transparent 120deg);
+    animation: logoSpin 3s linear infinite;
+  }
+  @keyframes logoSpin { to { transform: rotate(360deg); } }
+  .hero-logo-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+  }
+  .hero-logo-inner img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .hero-logo-label { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--fg2); text-align: center; line-height: 1.6; }
+
+  /* LETTER BOX */
+  .letter-box {
+    flex: 1; background: var(--letter-bg); border: 2px solid var(--letter-border);
+    border-radius: 4px; padding: 28px 28px 24px; position: relative;
+    box-shadow: 4px 4px 0 var(--letter-border), 8px 8px 0 rgba(0,0,0,0.04);
+    min-height: 220px; max-width: 600px;
+  }
+  .letter-box::before {
+    content: ''; display: block; height: 3px;
+    background: repeating-linear-gradient(90deg, var(--letter-border) 0px, var(--letter-border) 10px, transparent 10px, transparent 20px);
+    margin-bottom: 20px; opacity: 0.5;
+  }
+  .letter-lines {
+    position: absolute; inset: 48px 28px 28px;
+    background: repeating-linear-gradient(to bottom, transparent, transparent 27px, rgba(0,0,0,0.04) 28px);
+    pointer-events: none; border-radius: 2px;
+  }
+  .letter-stamp {
+    position: absolute; top: 12px; right: 14px; width: 40px; height: 48px;
+    border: 2px solid var(--letter-border); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; opacity: 0.5;
+  }
+  .letter-text {
+    font-family: 'Press Start 2P', monospace; font-size: clamp(7px, 1.2vw, 9px);
+    line-height: 2.2; color: var(--fg); min-height: 120px; position: relative; z-index: 1; word-break: break-word;
+  }
+  .cursor-blink {
+    display: inline-block; width: 2px; height: 1em; background: var(--accent);
+    margin-left: 2px; vertical-align: text-bottom; animation: blink 0.7s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* DOWNLOAD BUTTONS */
+  .hero-cta { display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+  .dl-btn {
+    display: flex; align-items: center; gap: 10px; padding: 12px 22px;
+    background: var(--fg); color: var(--bg); border-radius: 12px; text-decoration: none;
+    font-size: 13px; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s; border: 2px solid transparent;
+  }
+  .dl-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+  .dl-btn svg { width: 24px; height: 24px; fill: currentColor; flex-shrink: 0; }
+  .dl-btn span { display: flex; flex-direction: column; gap: 1px; }
+  .dl-btn .dl-label { font-size: 9px; opacity: 0.7; font-weight: 400; }
+  .dl-btn .dl-store { font-size: 14px; font-weight: 700; }
+  .dl-btn.outlined { background: transparent; color: var(--fg); border-color: var(--card-border); }
+  .dl-btn.outlined:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* SECTION BASE */
+  section { padding: 100px 5vw; }
+  .section-tag {
+    display: inline-block; font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    padding: 4px 12px; border: 1px solid var(--accent); border-radius: 20px; opacity: 0.8;
+  }
+  .section-title { font-size: clamp(28px, 4vw, 48px); font-weight: 700; line-height: 1.15; margin-bottom: 16px; letter-spacing: -1px; }
+  .section-sub { color: var(--fg2); font-size: 16px; max-width: 560px; line-height: 1.6; margin-bottom: 56px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+
+  /* =====================================================
+     SECTION 1 – BRAND INTRO (giống Garena)
+     ===================================================== */
+  #features {
+    background: var(--bg);
+    padding: 100px 5vw;
+  }
+
+  .brand-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  /* Logo icon lớn ở giữa */
+  .brand-logo-wrap {
+    margin-bottom: 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo-img {
+    width: clamp(80px, 12vw, 120px);
+    height: clamp(80px, 12vw, 120px);
+    object-fit: contain;
+    display: block;
+    /* Fallback nếu ảnh chưa có */
+    border-radius: 20px;
+  }
+  /* Placeholder khi ảnh lỗi — vẫn hiển thị đẹp */
+  .brand-logo-img-fallback {
+    width: clamp(80px, 12vw, 120px);
+    height: clamp(80px, 12vw, 120px);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(36px, 6vw, 56px);
+    box-shadow: 0 8px 32px rgba(26,26,255,0.2);
+  }
+  .brand-logo-name {
+    font-family:Arial;
+    font-size: 13px;
+    text-transform: uppercase;
+    color:#1877f2;
+    transition: color 0.4s;
+  }
+
+  /* Tiêu đề chính to, bold */
+.brand-headline {
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(22px, 3.5vw, 40px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--fg);
+  margin: 0 auto 24px auto; /* căn giữa khối */
+  max-width: 900px; /* giới hạn chiều rộng để chữ gọn */
+  text-align: center; /* căn giữa chữ */
+  letter-spacing: -0.5px;
+  transition: color 0.4s;
+}
+
+  /* Mô tả nhỏ hơn, màu nhạt */
+  .brand-desc {
+    font-size: clamp(13px, 1.5vw, 15px);
+    color: var(--fg2);
+    line-height: 1.75;
+    max-width: 580px;
+    transition: color 0.4s;
+  }
+  .brand-desc a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .brand-desc a:hover { text-decoration: underline; }
+
+  /* Divider */
+  .brand-divider {
+    width: 48px; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    margin: 32px auto 32px;
+  }
+
+  /* Stats row nhỏ phía dưới */
+  .brand-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .brand-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .brand-stat-num {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 800;
+    color: var(--fg);
+    letter-spacing: -1px;
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .brand-stat-label {
+    font-size: 12px;
+    color: var(--fg2);
+    font-weight: 500;
+    transition: color 0.4s;
+  }
+
+  /* SECTION 2 – MARQUEE */
+  #marquee-section { background: var(--bg2); overflow: hidden; padding: 80px 0; }
+  .marquee-header { text-align: center; padding: 0 5vw; margin-bottom: 56px; }
+  .marquee-track-wrap { overflow: hidden; position: relative; margin-bottom: 24px; }
+  .marquee-track-wrap::before, .marquee-track-wrap::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none;
+  }
+  .marquee-track-wrap::before { left: 0; background: linear-gradient(to right, var(--bg2), transparent); }
+  .marquee-track-wrap::after  { right: 0; background: linear-gradient(to left, var(--bg2), transparent); }
+  .marquee-track { display: flex; gap: 16px; width: max-content; animation: marqueeAnim 28s linear infinite; }
+  .marquee-track.reverse { animation-direction: reverse; }
+  @keyframes marqueeAnim { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-track:hover { animation-play-state: paused; }
+  .marquee-item {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 16px;
+    padding: 16px 20px; min-width: 100px; white-space: nowrap; transition: border-color 0.2s;
+  }
+  .marquee-item:hover { border-color: var(--accent); }
+  .marquee-item .m-icon { font-size: 28px; }
+  .marquee-item .m-name { font-size: 11px; font-weight: 600; color: var(--fg2); }
+
+  /* SECTION 3 – HIGHLIGHTS */
+  #highlights { background: var(--bg2); }
+  .highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 1024px) { .highlights-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .highlights-grid {
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch; gap: 14px; padding-bottom: 8px;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .highlights-grid::-webkit-scrollbar { display: none; }
+    .hl-card { flex: 0 0 80vw; max-width: 300px; scroll-snap-align: start; }
+  }
+  .hl-card {
+    background: transparent; border: 1.5px solid transparent; border-radius: 16px;
+    overflow: hidden; display: flex; flex-direction: column; padding: 20px 18px 22px;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s; cursor: default;
+  }
+  .hl-card:hover { background: var(--card); border-color: var(--card-border); box-shadow: 0 6px 28px rgba(0,0,0,0.07); }
+  [data-theme="dark"] .hl-card:hover { background: var(--card); border-color: rgba(255,255,255,0.1); box-shadow: 0 6px 28px rgba(0,0,0,0.3); }
+  .hl-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .hl-icon { font-size: 32px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+  .hl-title { font-size: 13px; font-weight: 800; color: var(--fg); line-height: 1.4; letter-spacing: -0.1px; transition: color 0.4s; }
+  .hl-body p { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; color: var(--fg2); line-height: 1.7; transition: color 0.4s; }
+  .hl-scroll-hint { display: none; justify-content: center; align-items: center; gap: 6px; margin-top: 16px; }
+  @media (max-width: 640px) { .hl-scroll-hint { display: flex; } }
+  .hl-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--card-border); transition: background 0.25s, transform 0.25s; }
+  .hl-dot.active { background: var(--accent); transform: scale(1.3); }
+
+  /* SECTION 4 – DOWNLOAD */
+  #download { background: var(--bg); text-align: center; }
+  .download-hero { max-width: 700px; margin: 0 auto; }
+  .download-hero .section-sub { margin: 0 auto 40px; }
+  .dl-buttons-center { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .dl-btn-large {
+    display: flex; align-items: center; gap: 14px; padding: 18px 32px;
+    border-radius: 16px; text-decoration: none; font-weight: 700; font-size: 15px;
+    transition: transform 0.2s, box-shadow 0.2s; border: 2px solid transparent;
+  }
+  .dl-btn-large:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.15); }
+  .dl-btn-large svg { width: 28px; height: 28px; fill: currentColor; }
+  .dl-btn-large span { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+  .dl-btn-large .dl-label { font-size: 10px; opacity: 0.7; font-weight: 400; }
+  .dl-btn-large .dl-store { font-size: 16px; font-weight: 800; }
+  .dl-btn-android { background: #3DDC84; color: #000; }
+  .dl-btn-ios { background: var(--fg); color: var(--bg); }
+  .stats-row { display: flex; justify-content: center; gap: 48px; margin-top: 64px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { display: block; font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -1px; color: var(--fg); }
+  .stat-label { font-size: 13px; color: var(--fg2); margin-top: 4px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--bg2); padding: 40px 5vw;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--card-border); flex-wrap: wrap; gap: 16px;
+  }
+  footer .footer-logo { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--fg2); }
+  footer p { color: var(--fg2); font-size: 13px; }
+  footer a { color: var(--fg2); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
+
+  /* REVEAL */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero-content { flex-direction: column; align-items: flex-start; padding: 80px 0 60px; gap: 40px; }
+    .hero-logo { flex-direction: row; align-items: center; }
+    .nav-links { display: none; }
+    .nav-toggle { display: flex; }
+  }
+  @media (max-width: 600px) {
+    .letter-box { padding: 18px; }
+    .hero-cta { gap: 10px; }
+    .dl-btn { padding: 10px 16px; }
+    .stats-row { gap: 28px; }
+    .brand-stats { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">
+      <img src="anh/chinhthuc.png" alt="logo">
+    </div>
+    <span class="nav-logo-text">ACERTBOOK</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#hero">Trang chủ</a></li>
+    <li><a href="#features">Giới thiệu</a></li>
+    <li><a href="#highlights">Nổi bật</a></li>
+    <li><a href="#download">Tải về</a></li>
+    <li><a href="#contact">Liên hệ</a></li>
+    <li>
+      <button class="theme-btn" id="themeToggle" title="Chuyển giao diện">
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button class="theme-btn nav-toggle-theme" id="themeToggleMobile" title="Chuyển giao diện" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" id="mIconSun">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" id="mIconMoon" style="display:none">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    <button class="nav-toggle" id="navToggle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero" onclick="closeMobile()">Trang chủ</a>
+  <a href="#features" onclick="closeMobile()">Giới thiệu</a>
+  <a href="#highlights" onclick="closeMobile()">Nổi bật</a>
+  <a href="#download" onclick="closeMobile()">Tải về</a>
+  <a href="#contact" onclick="closeMobile()">Liên hệ</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="circles-container" id="circles"></div>
+  <div class="hero-content">
+    <div class="hero-logo">
+      <div class="hero-logo-ring">
+        <span class="hero-logo-inner"><img src="anh/chinhthuc.png" alt="logo"></span>
+      </div>
+      <div class="hero-logo-label">ACERTBOOK</div>
+    </div>
+    <div class="letter-box reveal" style="transition-delay:0.1s">
+      <div class="letter-lines"></div>
+      <div class="letter-stamp">📮</div>
+      <div class="letter-text" id="letterText"></div>
+      <div class="hero-cta">
+        <a href="#download" class="dl-btn">
+          <svg viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.39-1.32 2.76-2.54 3.97zm-3.11-17.5c.06 2.06-1.61 3.77-3.62 3.91-.28-2.02 1.61-3.83 3.62-3.91z"/></svg>
+          <span><span class="dl-label">Tải trên</span><span class="dl-store">App Store</span></span>
+        </a>
+        <a href="#download" class="dl-btn outlined">
+          <svg viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4483-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993 0 .5511-.4483.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396"/></svg>
+          <span><span class="dl-label">Tải trên</span><span class="dl-store">Google Play</span></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 1 – BRAND INTRO (phong cách Garena) -->
+<section id="features">
+  <div class="section-inner">
+    <div class="brand-intro">
+
+      <!-- Logo + tên ứng dụng ở giữa -->
+      <div class="brand-logo-wrap reveal">
+        <img
+          class="brand-logo-img"
+          src="anh/chinhthuc.png"
+          alt="App Logo"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        >
+      </div>
+
+      <!-- Tiêu đề lớn, đậm -->
+      <h2 class="brand-headline reveal" style="transition-delay:0.1s">
+        Được thành lập và phát triển từ năm 2024, ACERTBOOK là một ứng dụng truy xuất hàng đầu với các tính năng được cập nhật liên tục.
+      </h2>
+
+      <!-- Divider accent -->
+      <div class="brand-divider reveal" style="transition-delay:0.18s"></div>
+
+      <!-- Mô tả nhỏ -->
+      <p class="brand-desc reveal" style="transition-delay:0.22s">
+    <a href="#">ACERTBOOK</a>, tập đoàn công nghệ hàng đầu toàn cầu. Sứ mệnh của ACERTBOOK là minh bạch và xây dựng lòng tin lẫn nhau, kết nối và chia sẻ.
+
+      <!-- Số liệu nổi bật -->
+      <div class="brand-stats reveal" style="transition-delay:0.3s">
+        <div class="brand-stat">
+          <span class="brand-stat-num" data-bcount="30000">0</span>
+          <span class="brand-stat-label">Người dùng toàn cầu</span>
+        </div>
+        <div class="brand-stat">
+          <span class="brand-stat-num" data-bcount="13">0</span>
+          <span class="brand-stat-label">Quốc gia</span>
+        </div>
+        <div class="brand-stat">
+          <span class="brand-stat-num" data-bcount="2024">0</span>
+          <span class="brand-stat-label">Năm thành lập</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2 – MARQUEE -->
+<section id="marquee-section">
+  <div class="marquee-header">
+    <div class="reveal"><span class="section-tag">Tích hợp</span></div>
+    <h2 class="section-title reveal" style="transition-delay:0.1s">Kết nối mọi nền tảng</h2>
+    <p class="section-sub reveal" style="transition-delay:0.2s; margin: 0 auto;">Tương thích và tích hợp với hàng chục dịch vụ phổ biến nhất thế giới.</p>
+  </div>
+  <div class="marquee-track-wrap">
+    <div class="marquee-track" id="marquee1"></div>
+  </div>
+  <div class="marquee-track-wrap" style="margin-top:0">
+    <div class="marquee-track reverse" id="marquee2"></div>
+  </div>
+</section>
+
+<!-- SECTION 3 – HIGHLIGHTS -->
+<section id="highlights">
+  <div class="section-inner">
+    <div class="reveal"><span class="section-tag">Nổi bật</span></div>
+    <h2 class="section-title reveal" style="transition-delay:0.1s">Trải nghiệm khác biệt</h2>
+    <p class="section-sub reveal" style="transition-delay:0.2s">Những tính năng độc đáo chỉ có trên Acertbook, được hàng triệu người dùng yêu thích.</p>
+
+    <div class="highlights-grid" id="hlGrid">
+      <div class="hl-card reveal" style="transition-delay:0.08s">
+        <div class="hl-top">
+          <span class="hl-icon">📱</span>
+          <span class="hl-title">Giao diện hoàn toàn mới 2025</span>
+        </div>
+        <div class="hl-body">
+          <p>Thiết kế lại từ đầu với ngôn ngữ thiết kế hiện đại, animation mượt mà 120fps, trải nghiệm chạm mượt trên mọi thiết bị.</p>
+        </div>
+      </div>
+      <div class="hl-card reveal" style="transition-delay:0.14s">
+        <div class="hl-top">
+          <span class="hl-icon">🤖</span>
+          <span class="hl-title">Trợ lý AI thông minh</span>
+        </div>
+        <div class="hl-body">
+          <p>Tích hợp AI giúp bạn gợi ý thông minh, tự động hóa tác vụ lặp lại và tối ưu hiệu suất công việc mỗi ngày.</p>
+        </div>
+      </div>
+      <div class="hl-card reveal" style="transition-delay:0.20s">
+        <div class="hl-top">
+          <span class="hl-icon">🌙</span>
+          <span class="hl-title">Dark Mode cực mượt</span>
+        </div>
+        <div class="hl-body">
+          <p>Chế độ tối được tinh chỉnh từng pixel, bảo vệ mắt tối ưu, chuyển đổi không nháy sáng — hoàn hảo mọi lúc.</p>
+        </div>
+      </div>
+      <div class="hl-card reveal" style="transition-delay:0.26s">
+        <div class="hl-top">
+          <span class="hl-icon">🔒</span>
+          <span class="hl-title">Bảo mật cấp ngân hàng</span>
+        </div>
+        <div class="hl-body">
+          <p>Mã hóa AES-256, xác thực sinh trắc học, không lưu mật khẩu trên máy chủ — dữ liệu thuộc về bạn.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hl-scroll-hint">
+      <div class="hl-dot active" data-idx="0"></div>
+      <div class="hl-dot" data-idx="1"></div>
+      <div class="hl-dot" data-idx="2"></div>
+      <div class="hl-dot" data-idx="3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4 – DOWNLOAD -->
+<section id="download">
+  <div class="section-inner">
+    <div class="download-hero">
+      <div class="reveal"><span class="section-tag">Tải ngay</span></div>
+      <h2 class="section-title reveal" style="transition-delay:0.1s">Sẵn sàng trải nghiệm?</h2>
+      <p class="section-sub reveal" style="transition-delay:0.2s">Miễn phí hoàn toàn. Không quảng cáo. Tải ngay trên App Store và Google Play.</p>
+      <div class="dl-buttons-center reveal" style="transition-delay:0.3s">
+        <a href="#" class="dl-btn-large dl-btn-ios">
+          <svg viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.39-1.32 2.76-2.54 3.97zm-3.11-17.5c.06 2.06-1.61 3.77-3.62 3.91-.28-2.02 1.61-3.83 3.62-3.91z"/></svg>
+          <span><span class="dl-label">Tải trên</span><span class="dl-store">App Store</span></span>
+        </a>
+        <a href="#" class="dl-btn-large dl-btn-android">
+          <svg viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4483-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993 0 .5511-.4483.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396"/></svg>
+          <span><span class="dl-label">Nhận trên</span><span class="dl-store">Google Play</span></span>
+        </a>
+      </div>
+      <div class="stats-row reveal" style="transition-delay:0.4s">
+        <div class="stat"><span class="stat-num" data-count="5000000">0</span><div class="stat-label">Lượt tải</div></div>
+        <div class="stat"><span class="stat-num" data-count="150">0</span><div class="stat-label">Quốc gia</div></div>
+        <div class="stat"><span class="stat-num" data-count="99">0</span><div class="stat-label">% Hài lòng</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-logo">ACERTBOOK © 2024</div>
+  <p>Liên hệ: <a href="mailto:acertbook@gmail.com">acertbook@gmail.com</a></p>
+  <div style="display:flex;gap:20px;">
+    <a href="#">Chính sách</a>
+    <a href="#">Điều khoản</a>
+    <a href="#">Facebook</a>
+    <a href="#">Instagram</a>
+    <a href="#">TikTok</a>
+  </div>
+</footer>
+
+<script>
+// THEME
+const html = document.documentElement;
+const sun = document.getElementById('iconSun'), moon = document.getElementById('iconMoon');
+const mSun = document.getElementById('mIconSun'), mMoon = document.getElementById('mIconMoon');
+let dark = false;
+function applyTheme(isDark) {
+  dark = isDark;
+  html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  sun.style.display  = isDark ? 'none'  : 'block';
+  moon.style.display = isDark ? 'block' : 'none';
+  mSun.style.display  = isDark ? 'none'  : 'block';
+  mMoon.style.display = isDark ? 'block' : 'none';
+}
+document.getElementById('themeToggle').addEventListener('click', () => applyTheme(!dark));
+document.getElementById('themeToggleMobile').addEventListener('click', () => applyTheme(!dark));
+
+// MOBILE NAV
+const navToggle = document.getElementById('navToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+navToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+function closeMobile() { mobileMenu.classList.remove('open'); }
+const mThemeBtn = document.querySelector('.nav-toggle-theme');
+function checkMobile() { mThemeBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+checkMobile();
+window.addEventListener('resize', checkMobile);
+
+// CIRCLES
+const container = document.getElementById('circles');
+for (let i = 0; i < 18; i++) {
+  const el = document.createElement('div');
+  el.className = 'circle';
+  const size = 40 + Math.random() * 120;
+  el.style.width = el.style.height = size + 'px';
+  el.style.left = (70 + Math.random() * 40) + 'vw';
+  el.style.top  = (20 + Math.random() * 70) + 'vh';
+  const dur = 8 + Math.random() * 12;
+  el.style.animationDuration = dur + 's';
+  el.style.animationDelay   = -(Math.random() * dur) + 's';
+  container.appendChild(el);
+}
+
+// TYPEWRITER
+const messages = [
+  `Chào mừng bạn đến với ACERTBOOK!\n\nỨng dụng được thiết kế cho cả iOS và Android.Tải miễn phí ngay hôm nay và khám phá thế giới số trong tầm tay bạn!\n\n\n\n –--------------------- Ra mắt năm 2024 –-------------------- `,
+  `ACERTBOOK\n\n> Giao diện hoàn toàn mới\n> Tích hợp AI và Blockchain\n> Bảo mật cấp cao\n> Đồng bộ đa thiết bị\n\nHơn 30 nghìn người đã tin tưởng sử dụng.\n\n\n --Bạn còn chờ gì nữa?`,
+  `Thân Gửi,\n\nCảm ơn bạn đã ghé thăm. Chúng tôi tạo ra ACERTBOOK với một mục đích duy nhất là mang lại trải nghiệm tuyệt vời nhất cho bạn.\n\n\n\nTải ngay và trải nghiệm Miễn phí!\n\n– Đội ngũ ACERTBOOK`
+];
+let msgIdx = 0, charIdx = 0, isDeleting = false, pauseTimer = null;
+const letterEl = document.getElementById('letterText');
+function typeWrite() {
+  const msg = messages[msgIdx];
+  if (!isDeleting) {
+    charIdx++;
+    letterEl.innerHTML = msg.slice(0, charIdx).replace(/\n/g, '<br>') + '<span class="cursor-blink"></span>';
+    if (charIdx === msg.length) {
+      clearTimeout(pauseTimer);
+      pauseTimer = setTimeout(() => { isDeleting = true; typeWrite(); }, 30000);
+      return;
+    }
+    setTimeout(typeWrite, msg[charIdx-1] === '\n' ? 80 : 45 + Math.random() * 40);
+  } else {
+    charIdx -= 2;
+    if (charIdx < 0) charIdx = 0;
+    letterEl.innerHTML = msg.slice(0, charIdx).replace(/\n/g, '<br>') + '<span class="cursor-blink"></span>';
+    if (charIdx === 0) { isDeleting = false; msgIdx = (msgIdx + 1) % messages.length; setTimeout(typeWrite, 400); return; }
+    setTimeout(typeWrite, 20);
+  }
+}
+setTimeout(typeWrite, 800);
+
+// MARQUEE
+const icons1 = [
+  {icon:'📸',name:'Instagram'},{icon:'📘',name:'Facebook'},{icon:'🐦',name:'Twitter/X'},
+  {icon:'💼',name:'LinkedIn'},{icon:'🎵',name:'Spotify'},{icon:'📺',name:'YouTube'},
+  {icon:'☁️',name:'Google Drive'},{icon:'📧',name:'Gmail'},{icon:'🗓️',name:'Calendar'},
+  {icon:'💳',name:'Stripe'},{icon:'🔔',name:'Slack'},{icon:'🎮',name:'Discord'},
+];
+const icons2 = [
+  {icon:'🛒',name:'Shopify'},{icon:'📦',name:'Amazon'},{icon:'🏦',name:'PayPal'},
+  {icon:'🗺️',name:'Google Maps'},{icon:'🤝',name:'Zoom'},{icon:'📊',name:'Notion'},
+  {icon:'🧠',name:'OpenAI'},{icon:'🐙',name:'GitHub'},{icon:'📐',name:'Figma'},
+  {icon:'🌐',name:'Cloudflare'},{icon:'🐳',name:'Docker'},{icon:'🔥',name:'Firebase'},
+];
+function buildMarquee(el, items) {
+  [...items, ...items].forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'marquee-item';
+    d.innerHTML = `<span class="m-icon">${item.icon}</span><span class="m-name">${item.name}</span>`;
+    el.appendChild(d);
+  });
+}
+buildMarquee(document.getElementById('marquee1'), icons1);
+buildMarquee(document.getElementById('marquee2'), icons2);
+
+// SCROLL REVEAL
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+document.querySelectorAll('#hero .reveal').forEach(el => el.classList.add('visible'));
+
+// HIGHLIGHTS DOT INDICATOR
+const hlGrid = document.getElementById('hlGrid');
+const hlDots = document.querySelectorAll('.hl-dot');
+if (hlGrid && hlDots.length) {
+  hlGrid.addEventListener('scroll', () => {
+    const cards = hlGrid.querySelectorAll('.hl-card');
+    if (!cards.length) return;
+    const cardW = cards[0].offsetWidth + 14;
+    const idx = Math.min(Math.round(hlGrid.scrollLeft / cardW), cards.length - 1);
+    hlDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }, { passive: true });
+}
+
+// COUNT-UP (section download)
+function countUp(el) {
+  const target = parseFloat(el.dataset.count);
+  const isFloat = String(target).includes('.');
+  const steps = 60; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    const cur = (target / steps) * step;
+    if (step >= steps) clearInterval(timer);
+    if (isFloat)            el.textContent = Math.min(cur, target).toFixed(1);
+    else if (target >= 1e9) el.textContent = (Math.min(cur,target)/1e9).toFixed(1)+'B+';
+    else if (target >= 1e6) el.textContent = (Math.min(cur,target)/1e6).toFixed(1)+'M+';
+    else if (target >= 1e3) el.textContent = Math.floor(Math.min(cur,target)/1e3)+'K+';
+    else el.textContent = Math.floor(Math.min(cur,target)) + (target===99?'%':target===150||target===190?'+':'');
+  }, 1800 / steps);
+}
+new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.querySelectorAll('[data-count]').forEach(countUp); } });
+}, { threshold: 0.3 }).observe(document.querySelector('.stats-row'));
+
+// COUNT-UP (brand stats)
+function brandCountUp(el) {
+  const target = parseFloat(el.dataset.bcount);
+  const isFloat = String(target).includes('.');
+  const steps = 60; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    const cur = (target / steps) * step;
+    if (step >= steps) clearInterval(timer);
+    if (isFloat)            el.textContent = Math.min(cur, target).toFixed(1) + '★';
+    else if (target >= 1e9) el.textContent = (Math.min(cur,target)/1e9).toFixed(1)+'B+';
+    else if (target >= 1e6) el.textContent = (Math.min(cur,target)/1e6).toFixed(1)+'M+';
+    else if (target >= 1e3 && target < 2010) el.textContent = Math.floor(Math.min(cur,target)/1e3)+'K+';
+    else el.textContent = Math.floor(Math.min(cur,target)) + (target===190?'+':'');
+  }, 2000 / steps);
+}
+// Năm thành lập: đếm thẳng không rút gọn
+function brandCountUpYear(el) {
+  const target = parseInt(el.dataset.bcount);
+  const start = target - 200;
+  const steps = 60; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    const cur = start + ((target - start) / steps) * step;
+    if (step >= steps) clearInterval(timer);
+    el.textContent = Math.floor(Math.min(cur, target));
+  }, 1800 / steps);
+}
+
+new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-bcount]').forEach(el => {
+        const val = parseFloat(el.dataset.bcount);
+        if (val >= 2000 && val <= 2100) brandCountUpYear(el);
+        else brandCountUp(el);
+      });
+    }
+  });
+}, { threshold: 0.3 }).observe(document.querySelector('.brand-stats'));
+</script>
+</body>
+</html>
